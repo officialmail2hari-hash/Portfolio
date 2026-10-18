@@ -1,0 +1,365 @@
+/* extras.css — loads AFTER style.css. Adds animations, skill cards, project modal, GitHub list. */
+
+main, footer { position: relative; z-index: 1; }
+
+/* ---------- Ambient layers ---------- */
+#bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: .55; }
+#glow {
+  position: fixed; top: 0; left: 0; width: 460px; height: 460px; z-index: 0; pointer-events: none;
+  margin: -230px 0 0 -230px; border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent, #7c8cff) 22%, transparent), transparent 65%);
+  transform: translate3d(-999px, -999px, 0); will-change: transform;
+}
+#progress {
+  position: fixed; top: 0; left: 0; height: 3px; width: 100%; z-index: 50;
+  background: linear-gradient(90deg, var(--accent, #7c8cff), var(--accent2, #4fd1c5));
+  transform: scaleX(0); transform-origin: 0 50%;
+}
+
+/* ---------- Nav active link ---------- */
+.nav nav a { position: relative; }
+.nav nav a::after {
+  content: ""; position: absolute; left: 0; bottom: -4px; height: 2px; width: 100%;
+  background: var(--accent, #7c8cff); transform: scaleX(0); transform-origin: left; transition: transform .3s;
+}
+.nav nav a.active { color: var(--text); }
+.nav nav a.active::after, .nav nav a:hover::after { transform: scaleX(1); }
+
+/* ---------- Hero stats ---------- */
+.stats { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 44px; }
+.stat {
+  min-width: 120px; padding: 14px 20px; border-radius: 14px;
+  background: var(--surface); border: 1px solid var(--border);
+  transition: transform .25s, border-color .25s;
+}
+.stat:hover { transform: translateY(-4px); border-color: var(--accent, #7c8cff); }
+.stat b { display: block; font-size: 1.9rem; line-height: 1.1; color: var(--accent, #7c8cff); }
+.stat span { font-size: .8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+
+/* Hero entrance */
+.hero > * { animation: rise .8s cubic-bezier(.2,.8,.2,1) both; }
+.hero > :nth-child(2) { animation-delay: .08s; }
+.hero > :nth-child(3) { animation-delay: .16s; }
+.hero > :nth-child(4) { animation-delay: .24s; }
+.hero > :nth-child(5) { animation-delay: .32s; }
+.hero > :nth-child(6) { animation-delay: .4s; }
+@keyframes rise { from { opacity: 0; transform: translateY(22px); } }
+
+/* ---------- Skills ---------- */
+.skill-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
+.skill-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
+.skill-card {
+  --mx: 50%; --my: 50%;
+  position: relative; overflow: hidden; padding: 22px 18px; border-radius: 16px;
+  background: var(--surface); border: 1px solid var(--border);
+  transform: perspective(700px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--ty, 0));
+  transition: transform .15s ease-out, border-color .3s, opacity .4s;
+  cursor: default;
+}
+.skill-card::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .3s;
+  background: radial-gradient(180px circle at var(--mx) var(--my), color-mix(in srgb, var(--accent, #7c8cff) 28%, transparent), transparent 70%);
+}
+.skill-card:hover { --ty: -6px; border-color: var(--accent, #7c8cff); }
+.skill-card:hover::before { opacity: 1; }
+.skill-card .s-icon {
+  display: inline-grid; place-items: center; width: 46px; height: 46px; font-size: 1.5rem; border-radius: 12px;
+  background: color-mix(in srgb, var(--accent, #7c8cff) 14%, transparent); margin-bottom: 12px;
+  transition: transform .3s;
+}
+.skill-card:hover .s-icon { transform: scale(1.15) rotate(-6deg); }
+.skill-card h4 { font-size: 1.02rem; }
+.skill-card p { color: var(--muted); font-size: .85rem; }
+.skill-card.learning { border-style: dashed; }
+.skill-card.learning p::before { content: "● "; color: var(--accent2, #4fd1c5); animation: pulse 1.6s infinite; }
+@keyframes pulse { 50% { opacity: .25; } }
+.skill-card.hide { display: none; }
+.skill-card.pop-in { animation: pop2 .45s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i, 0) * 60ms); }
+@keyframes pop2 { from { opacity: 0; transform: scale(.85) translateY(14px); } }
+
+/* ---------- Project cards ---------- */
+.card {
+  position: relative; cursor: pointer;
+  transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--ty, 0));
+  transition: transform .15s ease-out, border-color .25s, box-shadow .25s;
+  animation: cardIn .5s ease both; animation-delay: calc(var(--i, 0) * 80ms);
+}
+.card:hover { --ty: -6px; transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-6px); }
+.card:focus-visible { outline: 2px solid var(--accent, #7c8cff); outline-offset: 3px; }
+@keyframes cardIn { from { opacity: 0; } }
+.card .hint { font-size: .75rem; color: var(--muted); opacity: 0; transition: opacity .25s; }
+.card:hover .hint, .card:focus-visible .hint { opacity: 1; }
+.badge {
+  align-self: flex-start; font-size: .72rem; padding: 2px 9px; border-radius: 999px;
+  color: var(--accent2, #4fd1c5); border: 1px solid color-mix(in srgb, var(--accent2, #4fd1c5) 40%, transparent);
+}
+
+/* ---------- More on GitHub ---------- */
+.more { margin-top: 40px; }
+.more h4 { margin-bottom: 14px; color: var(--muted); font-weight: 600; }
+.more-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.more-list a {
+  display: block; padding: 14px 16px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border);
+  transition: transform .2s, border-color .2s;
+}
+.more-list a:hover { transform: translateY(-3px); border-color: var(--accent, #7c8cff); }
+.more-list b { display: block; }
+.more-list small { color: var(--muted); }
+
+/* ---------- Modal ---------- */
+dialog#modal {
+  margin: auto; max-width: min(560px, calc(100vw - 32px)); width: 100%; padding: 30px; border-radius: 18px;
+  background: var(--surface); color: var(--text); border: 1px solid var(--border);
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,.6);
+}
+dialog#modal[open] { animation: modalIn .3s cubic-bezier(.2,.8,.2,1); }
+dialog#modal::backdrop { background: rgba(5, 7, 12, .65); backdrop-filter: blur(4px); }
+@keyframes modalIn { from { opacity: 0; transform: translateY(20px) scale(.97); } }
+#mTitle { font-size: 1.5rem; margin-bottom: 10px; }
+#mDesc { color: var(--muted); margin-bottom: 16px; }
+#mTags { margin-bottom: 14px; }
+.m-meta { color: var(--muted); font-size: .85rem; margin-bottom: 18px; }
+.m-close {
+  position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text); cursor: pointer;
+}
+.m-close:hover { border-color: var(--accent, #7c8cff); }
+
+/* ---------- Back to top ---------- */
+#toTop {
+  position: fixed; right: 22px; bottom: 22px; z-index: 20; width: 46px; height: 46px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--accent, #7c8cff); color: #fff; font-size: 1.2rem; cursor: pointer;
+  box-shadow: 0 10px 24px -8px rgba(0,0,0,.5); transition: transform .2s;
+}
+#toTop:hover { transform: translateY(-4px); }
+
+/* ---------- Staggered reveal for children ---------- */
+.reveal .timeline .item { opacity: 0; transform: translateX(-16px); transition: opacity .6s, transform .6s; }
+.reveal.visible .timeline .item { opacity: 1; transform: none; }
+.reveal.visible .timeline .item:nth-child(2) { transition-delay: .1s; }
+.reveal.visible .timeline .item:nth-child(3) { transition-delay: .2s; }
+.reveal.visible .timeline .item:nth-child(4) { transition-delay: .3s; }
+
+@media (hover: none) { #glow { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  #bg, #glow { display: none; }
+  .card, .skill-card { transform: none !important; }
+  .reveal .timeline .item { opacity: 1; transform: none; }
+}
+
+/* ===== MORE ANIMATIONS (paste at the very end of extras.css) ===== */
+
+/* 1. Shimmering gradient on your name */
+.hero h1 {
+  background-image: linear-gradient(90deg, var(--text), var(--accent), var(--accent2, #4fd1c5), var(--text));
+  background-size: 200% 100%;
+  animation: rise .8s cubic-bezier(.2,.8,.2,1) both, shimmer 7s linear infinite;
+}
+@keyframes shimmer { to { background-position: 200% 0; } }
+
+/* 2. Floating colour blobs behind the hero (they also drift on scroll) */
+.hero { position: relative; }
+.hero::before, .hero::after {
+  content: ""; position: absolute; z-index: -1; border-radius: 50%;
+  filter: blur(70px); opacity: .35; pointer-events: none;
+}
+.hero::before {
+  width: 300px; height: 300px; right: 2%; top: 12%; background: var(--accent, #7c8cff);
+  animation: drift 14s ease-in-out infinite alternate; translate: 0 calc(var(--sy, 0) * -.12px);
+}
+.hero::after {
+  width: 240px; height: 240px; right: 22%; bottom: 6%; background: var(--accent2, #4fd1c5);
+  animation: drift 18s ease-in-out infinite alternate-reverse; translate: 0 calc(var(--sy, 0) * .08px);
+}
+@keyframes drift { to { transform: translate(-40px, 30px) scale(1.15); } }
+
+/* 3. Buttons: shine sweep + magnetic pull (JS) */
+.btn { position: relative; overflow: hidden; transition: transform .2s, border-color .2s, translate .2s ease-out; }
+.btn::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; transform: translateX(-120%);
+  background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.35) 50%, transparent 70%);
+}
+.btn:hover::after { transform: translateX(120%); transition: transform .7s; }
+#themeToggle { transition: translate .2s ease-out, transform .3s; }
+#themeToggle:hover { transform: rotate(20deg); }
+
+/* 4. Click ripple on buttons and filter chips */
+.chip { position: relative; overflow: hidden; }
+.ripple {
+  position: absolute; border-radius: 50%; background: rgba(255,255,255,.4); pointer-events: none;
+  transform: scale(0); animation: ripple .65s ease-out forwards;
+}
+@keyframes ripple { to { transform: scale(2.6); opacity: 0; } }
+
+/* 5. Section underline draws itself */
+.reveal .section-title::after { transform: scaleX(0); transform-origin: left; transition: transform .8s .25s; }
+.reveal.visible .section-title::after { transform: none; }
+
+/* 6. About: paragraph slides in from the left, facts stagger in from the right */
+.reveal .about-grid > p { opacity: 0; transform: translateX(-26px); transition: opacity .7s, transform .7s; }
+.reveal.visible .about-grid > p { opacity: 1; transform: none; }
+.reveal .facts li { opacity: 0; transform: translateX(26px); transition: opacity .6s, transform .6s; }
+.reveal.visible .facts li { opacity: 1; transform: none; }
+.reveal.visible .facts li:nth-child(2) { transition-delay: .12s; }
+.reveal.visible .facts li:nth-child(3) { transition-delay: .24s; }
+.reveal.visible .facts li:nth-child(4) { transition-delay: .36s; }
+
+/* 7. Skill icons gently float */
+.s-icon { animation: bob 3.2s ease-in-out infinite; }
+.skill-card:nth-child(2n) .s-icon { animation-delay: -.8s; }
+.skill-card:nth-child(3n) .s-icon { animation-delay: -1.6s; }
+@keyframes bob { 50% { translate: 0 -5px; } }
+
+/* 8. Project cards: spotlight follows the mouse */
+.card::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .3s;
+  background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--accent, #7c8cff) 22%, transparent), transparent 70%);
+}
+.card:hover::before { opacity: 1; }
+
+/* 9. Timeline dots pulse */
+.item::before { animation: ring 2.4s ease-out infinite; }
+.item:nth-child(2)::before { animation-delay: .5s; }
+.item:nth-child(3)::before { animation-delay: 1s; }
+.item:nth-child(4)::before { animation-delay: 1.5s; }
+@keyframes ring {
+  0%   { box-shadow: 0 0 0 4px var(--bg), 0 0 0 4px color-mix(in srgb, var(--accent) 60%, transparent); }
+  100% { box-shadow: 0 0 0 4px var(--bg), 0 0 0 16px transparent; }
+}
+
+/* 10. Scrolling skills ticker */
+.marquee {
+  overflow: hidden; padding: 18px 0; margin-top: 10px; border-block: 1px solid var(--border);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+.marquee-track { display: flex; width: max-content; animation: ticker 28s linear infinite; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+.marquee span { white-space: nowrap; padding-right: 44px; font-family: "JetBrains Mono", monospace; font-size: .95rem; color: var(--muted); }
+.marquee span::before { content: "✦ "; color: var(--accent2, #4fd1c5); }
+@keyframes ticker { to { transform: translateX(-50%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero::before, .hero::after { display: none; }
+  .hero h1, .s-icon, .item::before, .marquee-track { animation: none; }
+  .reveal .about-grid > p, .reveal .facts li { opacity: 1; transform: none; }
+}
+
+/* ===== NAME: 3D TILT + SPOTLIGHT (paste at the very end of extras.css) ===== */
+.hero h1 {
+  /* spotlight layer on top of the shimmer gradient */
+  background-image:
+    radial-gradient(circle 110px at var(--nx, -300px) var(--ny, -300px), var(--accent2, #4fd1c5), transparent 70%),
+    linear-gradient(90deg, var(--text), var(--accent), var(--accent2, #4fd1c5), var(--text));
+  background-size: 100% 100%, 200% 100%;
+  background-repeat: no-repeat, repeat;
+  /* tilt */
+  transform-origin: left center;
+  transform: perspective(700px) rotateX(var(--hx, 0deg)) rotateY(var(--hy, 0deg));
+  transition: transform .15s ease-out;
+  cursor: default;
+}
+@keyframes shimmer {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 0 0, 200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero h1 { transform: none; }
+}
+
+/* ===== NAME OPTION C: breathing neon glow ===== */
+.hero h1 {
+  animation: rise .8s cubic-bezier(.2,.8,.2,1) both, shimmer 7s linear infinite, glow 3s ease-in-out infinite alternate;
+}
+@keyframes glow {
+  from { filter: drop-shadow(0 0 4px  color-mix(in srgb, var(--accent) 30%, transparent)); }
+  to   { filter: drop-shadow(0 0 22px color-mix(in srgb, var(--accent) 65%, transparent)); }
+}
+
+/* ===== SPLASH + CHART UNDERLINE + SECTION COLOUR SHIFT ===== */
+
+/* --- A. Colour shift: colours glide when the section changes --- */
+@property --accent  { syntax: "<color>"; inherits: true; initial-value: #7c8cff; }
+@property --accent2 { syntax: "<color>"; inherits: true; initial-value: #4fd1c5; }
+html { transition: --accent 1.2s ease, --accent2 1.2s ease; }
+
+html[data-sec="about"]     { --accent: #4da3ff; --accent2: #7c8cff; }
+html[data-sec="skills"]    { --accent: #b583ff; --accent2: #ff7ad9; }
+html[data-sec="projects"]  { --accent: #ffb454; --accent2: #ff7a59; }
+html[data-sec="education"] { --accent: #4ade80; --accent2: #22d3ee; }
+html[data-sec="contact"]   { --accent: #ff6b9a; --accent2: #ffb454; }
+
+html[data-theme="light"][data-sec="about"]     { --accent: #2563eb; --accent2: #4f46e5; }
+html[data-theme="light"][data-sec="skills"]    { --accent: #7c3aed; --accent2: #c026d3; }
+html[data-theme="light"][data-sec="projects"]  { --accent: #d97706; --accent2: #ea580c; }
+html[data-theme="light"][data-sec="education"] { --accent: #16a34a; --accent2: #0891b2; }
+html[data-theme="light"][data-sec="contact"]   { --accent: #e11d48; --accent2: #d97706; }
+
+/* --- B. Splash screen --- */
+#splash {
+  position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; overflow: hidden;
+  background: var(--bg); cursor: pointer;
+  transition: transform .9s cubic-bezier(.76,0,.24,1), border-radius .9s cubic-bezier(.76,0,.24,1);
+  animation: splashFail 0s linear 6s forwards;               /* safety: never stays forever */
+}
+@keyframes splashFail { to { visibility: hidden; pointer-events: none; } }
+#splash::before {
+  content: ""; position: absolute; width: 520px; height: 520px; border-radius: 50%; filter: blur(80px);
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 45%, transparent), transparent 70%);
+  animation: splashGlow 2.4s ease-in-out infinite alternate;
+}
+@keyframes splashGlow { from { transform: scale(.8); opacity: .6; } to { transform: scale(1.15); opacity: 1; } }
+#splash.leave { transform: translateY(-100%); border-radius: 0 0 50% 50% / 0 0 14% 14%; pointer-events: none; }
+.sp-inner { position: relative; display: grid; justify-items: center; gap: 16px; transition: opacity .35s, transform .5s; }
+#splash.leave .sp-inner { opacity: 0; transform: scale(1.12); }
+.sp-mark { position: relative; display: grid; place-items: center; padding: 34px 44px; }
+.sp-ring {
+  position: absolute; inset: 0; border-radius: 50%; border: 2px solid transparent;
+  border-top-color: var(--accent); border-right-color: var(--accent2, #4fd1c5); animation: spin 1.3s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.sp-logo { display: flex; font-size: clamp(3.6rem, 15vw, 6.5rem); font-weight: 700; line-height: 1; letter-spacing: -.02em; }
+.sp-logo span { display: inline-block; opacity: 0; transform: translateY(30px) scale(.6); animation: letterPop .7s cubic-bezier(.2,1.4,.4,1) forwards; }
+.sp-logo .l1 { animation-delay: .15s; }
+.sp-logo .l2 { animation-delay: .3s; }
+.sp-logo .l3 { animation-delay: .45s; color: var(--accent); }
+@keyframes letterPop { to { opacity: 1; transform: none; } }
+.sp-text, .sp-pct { font-family: "JetBrains Mono", monospace; color: var(--muted); font-size: .85rem; letter-spacing: .08em; }
+.sp-text { opacity: 0; animation: fadeUp .6s .7s forwards; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.sp-line { width: min(260px, 62vw); height: 3px; border-radius: 3px; overflow: hidden; background: var(--border); }
+.sp-line i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent2, #4fd1c5)); animation: fillBar 2.2s linear forwards; }
+@keyframes fillBar { to { width: 100%; } }
+.sp-skip {
+  position: absolute; right: 22px; bottom: 22px; padding: 8px 16px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface); color: var(--muted); font: inherit; font-size: .85rem;
+}
+.sp-skip:hover { color: var(--text); border-color: var(--accent); }
+html.splashing { overflow: hidden; }
+html.no-splash #splash { display: none; }
+
+/* hero waits (paused) until the splash lifts, so you actually see its entrance */
+html.splashing .hero *, html.splashing .hero::before, html.splashing .hero::after { animation-play-state: paused; }
+
+/* --- C. Chart underline --- */
+.chart-line { display: block; width: min(100%, 380px); height: auto; margin: 4px 0 16px; overflow: visible; }
+.chart-line .grid line { stroke: var(--border); stroke-width: 1; stroke-dasharray: 3 5; }
+.chart-line .line { stroke-dasharray: 1; stroke-dashoffset: 1; animation: chartDraw 1.8s cubic-bezier(.5,0,.2,1) 1s forwards; }
+.chart-line .area { opacity: 0; animation: areaIn 1s ease 2s forwards; }
+.chart-line .pt { fill: var(--bg); stroke: var(--accent); stroke-width: 2; opacity: 0; animation: ptIn .4s ease forwards; animation-delay: calc(var(--d) * 1s); }
+.chart-line .end { fill: var(--accent2, #4fd1c5); opacity: 0; animation: ptIn .4s ease 2.8s forwards; }
+.chart-line .pulse { fill: var(--accent2, #4fd1c5); opacity: 0; transform-box: fill-box; transform-origin: center; animation: ringPulse 1.8s ease-out 3s infinite; }
+@keyframes chartDraw { to { stroke-dashoffset: 0; } }
+@keyframes areaIn { to { opacity: 1; } }
+@keyframes ptIn { to { opacity: 1; } }
+@keyframes ringPulse { 0% { opacity: .6; transform: scale(.6); } 100% { opacity: 0; transform: scale(3); } }
+.chart-line .pt { transition: r .2s; }
+.chart-line .pt:hover { r: 6; }
+
+@media (prefers-reduced-motion: reduce) {
+  #splash { display: none; }
+  .chart-line .line { stroke-dashoffset: 0; animation: none; }
+  .chart-line .area, .chart-line .pt, .chart-line .end { opacity: 1; animation: none; }
+  .chart-line .pulse { display: none; }
+  html { transition: none; }
+}
