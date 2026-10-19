@@ -374,3 +374,5 @@ body.mode-game #hint { bottom: calc(22px + env(safe-area-inset-bottom)); }
 .lg h3 { font-family: "JetBrains Mono", monospace; font-size: .7rem; letter-spacing: .16em; text-transform: uppercase; color: var(--pa); margin-bottom: 8px; }
 .tags.big span { font-size: .8rem; padding: 6px 12px; border-radius: 999px; }
 @media (prefers-reduced-motion: reduce) { .ring, .orb, .core, .orbit { animation: none; } }
+
+.pcard .pstatus { flex: 0 0 auto; font-size: .78rem; color: var(--pa); font-family: 'JetBrains Mono', monospace; margin: 0; }
