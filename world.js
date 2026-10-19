@@ -44,15 +44,16 @@ const PROJECTS = [
     desc: "A DNA Based Cold Data Archival System that uses DNA sequences to encode and store digital data." },
   { title: "FEMGUARD", repo: "", demo: "", status: "🔒 Hardware · no public code", tags: ["IoT", "GSM", "Safety"],
     desc: "A standalone GSM-based wearable security device for women's safety, also published as a conference paper." },
-  { title: "SMART AGRICULTURAL ASSISTANT", repo: "Agri_Assist", demo: "", tags: ["Mini Project", "AI", "Agriculture"],
-    desc: "A mini project that assists farmers with smart, data-driven agricultural support." },
-  { title: "CIVICFIX", repo: "CivicFix", demo: "", tags: ["Web", "Civic Tech"],
-    desc: "A civic-tech platform for reporting and tracking community issues." },
-  { title: "BUDDYTRON", repo: "", demo: "", status: "🔒 Hardware · Code not public", tags: ["AI", "Assistant"],
+  { title: "SMART AGRICULTURAL ASSISTANT", repo: "Agri_Assist", demo: "", tags: ["Python", "Streamlit", "Mini Project", "Agriculture"],
+    desc: "A bilingual (English + Tamil) farmer chatbot with voice, leaf-disease checks, fertilizer dosage and crop recommendations." },
+  { title: "CIVICFIX", repo: "CivicFix", demo: "", tags: ["React", "FastAPI", "AI", "NLP"],
+    desc: "An AI-powered campus complaint and maintenance system with complaint classification, duplicate detection, smart staff assignment, SLA monitoring and hotspot analytics." },
+  { title: "BUDDYTRON", repo: "", demo: "", status: "🔒 Code not public", tags: ["AI", "Assistant"],
     desc: "An interactive buddy-style assistant project." },
 ];
 
-
+/* ===== EDIT ME: replace these two placeholders with your real papers =====
+   scope must be "International" or "National". Delete / add entries freely. */
 const PAPERS = [
   { title: "FemGuard: A Standalone GSM-Based Wearable Security Device for Women's Safety",
     venue: "National Conference", place: "", year: "", scope: "National", role: "Second author", status: "Presented",
@@ -65,10 +66,15 @@ const PAPERS = [
 ];
 
 const EDU = [
-  { d: "2024 – Present", t: "B.Sc in Data Science", s: "The Standard Fireworks College for Women · CGPA 8.9" },
-  { d: "Apr – Aug 2025", t: "Operations Intern — Spellzee Edutech Solutions Pvt. Ltd.", s: "Data Handling and Reporting" },
-  { d: "Apr 2026", t: "Intern — Anjana Infotech", s: "Learned basics in AI/ML" },
-  { d: "2019 – 2020", t: "Higher Secondary", s: "AKD Dharmaraja Girls Higher Secondary School · State Board" },
+  { d: "2024 – Present", t: "B.Sc in Data Science", s: "The Standard Fireworks College for Women · CGPA 8.9", icon: "🎓", cgpa: 8.9,
+    role: "Studying Data Science with a focus on Python, data analysis and AI. Alongside coursework I build full projects, from chatbots to campus tools, and publish research.",
+    ach: ["CGPA 8.9", "Co-authored 2 published conference papers", "Built 8 projects across AI, web and IoT"] },
+  { d: "Apr – Aug 2025", t: "Operations Intern — Spellzee Edutech Solutions Pvt. Ltd.", s: "Data Handling and Reporting", icon: "📊",
+    role: "Worked on data handling and reporting in an operations role at an edtech company.", ach: [] },
+  { d: "Apr 2026", t: "Intern — Anjana Infotech", s: "Learned basics in AI/ML", icon: "🤖",
+    role: "Learned the basics of AI and machine learning during an internship.", ach: [] },
+  { d: "2019 – 2020", t: "Higher Secondary", s: "AKD Dharmaraja Girls Higher Secondary School · State Board", icon: "🏫",
+    role: "Completed higher secondary education under the State Board.", ach: [] },
 ];
 
 /* =========================== HELPERS =============================== */
@@ -92,6 +98,8 @@ function h(tag, props, ...kids) {
 }
 const ext = (label, href) => h("a", { href, target: "_blank", rel: "noopener" }, label);
 
+/* ============================ SOUND ================================ */
+/* Everything is synthesised live with the Web Audio API: no files. */
 const Snd = (() => {
   let ctx, master, noise, thrGain, ready = false, on = false;
   function ensure() {
@@ -298,8 +306,24 @@ function buildPapers() {
   paint();
   return h("div", null, h("div", { class: "controls" }, h("span", { class: "muted" }, PAPERS.length + " publications"), chips), grid);
 }
+function openEduCard(e) {
+  closeEduCard();
+  const close = () => closeEduCard();
+  const body = h("div", { class: "dcard", role: "dialog", "aria-label": e.t },
+    h("button", { class: "x", type: "button", "aria-label": "Close details", onclick: close }, "✕"),
+    h("div", { class: "dhead" },
+      e.cgpa ? h("div", { class: "ring", style: "--p:" + (e.cgpa / 10 * 100) + "%" }, h("b", null, e.cgpa)) : h("div", { class: "dico" }, e.icon),
+      h("div", null, h("span", { class: "d" }, e.d), h("h3", null, e.t), h("p", { class: "muted" }, e.s))),
+    h("h4", null, "Role summary"), h("p", { class: "lead" }, e.role),
+    e.ach && e.ach.length ? [h("h4", null, "Achievements"), h("ul", { class: "alist" }, e.ach.map(a => h("li", null, a)))] : null);
+  const back = h("div", { class: "dback", onclick: ev => { if (ev.target === back) close(); } }, body);
+  panel.append(back); Snd.chime && Snd.chime(); requestAnimationFrame(() => back.classList.add("on")); body.querySelector(".x").focus();
+}
+function closeEduCard() { const b = $(".dback", panel); if (b) b.remove(); }
+document.addEventListener("keydown", ev => { if (ev.key === "Escape" && $(".dback", panel)) { ev.stopImmediatePropagation(); closeEduCard(); } }, true);
 function buildEdu() {
-  return h("div", { class: "tl" }, EDU.map((e, i) => h("div", { class: "it", style: "--i:" + i }, h("span", { class: "d" }, e.d), h("h3", null, e.t), h("p", null, e.s))));
+  return h("div", { class: "tl" }, EDU.map((e, i) => h("button", { class: "it clickable", type: "button", style: "--i:" + i, onclick: () => { Snd.click(); openEduCard(e); } },
+    h("span", { class: "d" }, e.d), h("h3", null, e.t), h("p", null, e.s), h("span", { class: "more" }, "View details ▸"))));
 }
 function buildContact() {
   const f = h("form", { class: "form" },
@@ -480,7 +504,7 @@ function openSection(id) {
     const x = $(".x", sheet); if (x) x.focus({ preventScroll: true });
   }, S.mode === "cube" ? 560 : 260);
 }
-function closePanel() {
+function closePanel() { closeEduCard();
   if (!S.open) return;
   panel.classList.remove("open"); stage.classList.remove("zoom"); S.open = null; S.idle = 0; Snd.whoosh();
   if (!RM) warp = .6;
