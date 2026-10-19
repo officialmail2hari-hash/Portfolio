@@ -9,6 +9,8 @@
 /* ============================== DATA =============================== */
 const GITHUB   = "https://github.com/officialmail2hari-hash";
 const LINKEDIN = "https://linkedin.com/in/harishma-m";
+// Free key from https://web3forms.com (type your email, the key arrives in your inbox). Paste it between the quotes:
+const FORM_KEY = "";
 const EMAIL    = "officialmail2hari@gmail.com";
 const RESUME   = "Harishma_M.pdf";
 
@@ -45,12 +47,14 @@ const PROJECTS = [
 /* ===== EDIT ME: replace these two placeholders with your real papers =====
    scope must be "International" or "National". Delete / add entries freely. */
 const PAPERS = [
-  { title: "Your International Paper Title Goes Here", venue: "Name of the International Conference", place: "City, Country", year: "2026",
-    scope: "International", role: "First author · Oral presentation", award: "", link: "",
-    summary: "One or two lines on what the paper is about and what you found." },
-  { title: "Your National Paper Title Goes Here", venue: "Name of the National Conference", place: "City, India", year: "2025",
-    scope: "National", role: "Co-author · Poster", award: "", link: "",
-    summary: "One or two lines on what the paper is about and what you found." },
+  { title: "FemGuard: A Standalone GSM-Based Wearable Security Device for Women's Safety",
+    venue: "National Conference", place: "", year: "", scope: "National", role: "Second author", status: "Presented",
+    isbn: "978-93-32-2982-0", pages: "23", award: "", link: "", authors: "",
+    summary: "" },
+  { title: "The Dark Side of AI Communication: Ethical Concerns of Deepfakes and Data Misuse",
+    venue: "ICISDE 2026", place: "", year: "2026", scope: "International", role: "Second author", status: "Published",
+    isbn: "978-59-642637-5-3", pages: "18", award: "", link: "", authors: "",
+    summary: "" },
 ];
 
 const EDU = [
@@ -257,7 +261,9 @@ function buildProjects() {
   return h("div", null, h("div", { class: "controls" }, q, chips), grid);
 }
 function bibtex(p, i) {
-  return `@inproceedings{harishma${p.year}_${i + 1},\n  author    = {Harishma M},\n  title     = {${p.title}},\n  booktitle = {${p.venue}},\n  address   = {${p.place}},\n  year      = {${p.year}}\n}`;
+  const f = [["author", p.authors || "Harishma M and others"], ["title", p.title], ["booktitle", p.venue], ["address", p.place], ["year", p.year], ["pages", p.pages], ["isbn", p.isbn]]
+    .filter(x => x[1]).map(x => `  ${x[0].padEnd(9)} = {${x[1]}}`).join(",\n");
+  return `@inproceedings{harishma${p.year || "paper"}_${i + 1},\n${f}\n}`;
 }
 function buildPapers() {
   const chips = h("div", { class: "chips" }), grid = h("div", { class: "cards" });
@@ -272,9 +278,10 @@ function buildPapers() {
     wrap.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); flip(); } });
     wrap.append(h("div", { class: "flipper" },
       h("div", { class: "front" }, h("span", { class: "badge scope" }, p.scope), h("h3", null, p.title),
-        h("p", { class: "meta" }, p.venue, h("br"), p.place + " · " + p.year, h("br"), p.role),
+        h("p", { class: "meta" }, p.venue, [p.place, (p.venue.includes(p.year) ? "" : p.year)].filter(Boolean).length ? [h("br"), [p.place, (p.venue.includes(p.year) ? "" : p.year)].filter(Boolean).join(" · ")] : null,
+          h("br"), [p.role, p.status].filter(Boolean).join(" · "), (p.isbn || p.pages) ? [h("br"), [p.isbn && "ISBN " + p.isbn, p.pages && "Page " + p.pages].filter(Boolean).join(" · ")] : null),
         p.award ? h("p", { class: "award" }, "🏆 " + p.award) : null, h("span", { class: "tip" }, "tap to read the abstract ↻")),
-      h("div", { class: "back" }, h("h3", null, "Abstract"), h("p", { class: "meta" }, p.summary),
+      h("div", { class: "back" }, h("h3", null, "Abstract"), h("p", { class: "meta" }, p.summary || "Abstract coming soon."),
         h("div", { class: "links" }, p.link ? ext("Read paper ↗", p.link) : null,
           h("a", { href: "#", onclick: e => { e.preventDefault(); e.stopPropagation(); const t = bibtex(p, i);
             (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => e.target.textContent = "Copied ✓", () => e.target.textContent = "Copy failed"); } }, "Copy BibTeX")),
@@ -294,9 +301,20 @@ function buildContact() {
     h("input", { name: "email", type: "email", placeholder: "Your email", required: "", autocomplete: "email" }),
     h("textarea", { name: "message", rows: "4", placeholder: "Your message", required: "" }),
     h("button", { class: "pbtn solid", type: "submit" }, "Send message ▸"));
-  f.addEventListener("submit", e => {
+  const btn = f.querySelector("button");
+  f.addEventListener("submit", async e => {
     e.preventDefault(); const d = new FormData(f);
-    location.href = `mailto:${EMAIL}?subject=${encodeURIComponent("Portfolio message from " + d.get("name"))}&body=${encodeURIComponent(d.get("message") + "\n\n— " + d.get("name") + " (" + d.get("email") + ")")}`;
+    const fallback = () => { location.href = `mailto:${EMAIL}?subject=${encodeURIComponent("Portfolio message from " + d.get("name"))}&body=${encodeURIComponent(d.get("message") + "\n\n— " + d.get("name") + " (" + d.get("email") + ")")}`; };
+    if (!FORM_KEY) return fallback();
+    btn.disabled = true; btn.textContent = "Sending…";
+    try {
+      const r = await fetch("https://api.web3forms.com/submit", { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ access_key: FORM_KEY, subject: "Portfolio message from " + d.get("name"), name: d.get("name"), email: d.get("email"), message: d.get("message") }) });
+      const j = await r.json();
+      if (!j.success) throw new Error(j.message);
+      f.reset(); btn.textContent = "Sent ✓ Thank you!";
+    } catch (err) { btn.textContent = "Couldn't send. Opening your email app…"; setTimeout(fallback, 900); }
+    setTimeout(() => { btn.disabled = false; btn.textContent = "Send message ▸"; }, 4000);
   });
   return h("div", null, h("p", { class: "lead" }, "I’m open to full-time jobs and internships. Say hello!"),
     h("div", { class: "row" }, h("a", { class: "pbtn solid", href: "mailto:" + EMAIL }, "✉ Email"), ext("GitHub ↗", GITHUB), ext("LinkedIn ↗", LINKEDIN),
@@ -634,7 +652,7 @@ const CMDS = {
   about() { say(ABOUT.text); },
   skills() { SKILLS.forEach(g => say(g.g + ": " + g.items.map(i => i[1]).join(", "))); },
   projects() { PROJECTS.forEach(p => { say("• " + p.title + " — " + p.desc); sayLink("   " + GITHUB.replace("https://", "") + "/" + p.repo, GITHUB + "/" + p.repo); }); },
-  papers() { PAPERS.forEach(p => say("• " + p.title + " — " + p.venue + ", " + p.place + " (" + p.year + ", " + p.scope + ")")); },
+  papers() { PAPERS.forEach(p => say("• " + p.title + " — " + [p.venue, p.place, p.year].filter(Boolean).join(", ") + " (" + p.scope + (p.status ? ", " + p.status.toLowerCase() : "") + ")")); },
   education() { EDU.forEach(e => say(e.d + "  " + e.t + " · " + e.s)); },
   contact() { say("Email: " + EMAIL); sayLink("GitHub: " + GITHUB, GITHUB); sayLink("LinkedIn: " + LINKEDIN, LINKEDIN); },
   resume() { say("Downloading résumé…"); const a = h("a", { href: RESUME, download: "" }); document.body.append(a); a.click(); a.remove(); },
