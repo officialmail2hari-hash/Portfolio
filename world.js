@@ -73,7 +73,7 @@ const EDU = [
     role: "Worked on data handling and reporting in an operations role at an edtech company.", ach: [] },
   { d: "Apr 2026", t: "Intern — Anjana Infotech", s: "Learned basics in AI/ML", icon: "🤖",
     role: "Learned the basics of AI and machine learning during an internship.", ach: [] },
-  { d: "2019 – 2020", t: "Higher Secondary", s: "AKD Dharmaraja Girls Higher Secondary School · State Board · Percentage 92%", icon: "🏫", cgpa: 9.2,
+  { d: "2020 – 2021", t: "Higher Secondary", s: "AKD Dharmaraja Girls Higher Secondary School · State Board · Percentage 92%", icon: "🏫", cgpa: 9.2,
     role: "Completed higher secondary education under the State Board.", ach: [] },
 ];
 
