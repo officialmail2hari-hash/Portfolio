@@ -10,7 +10,7 @@
 const GITHUB   = "https://github.com/officialmail2hari-hash";
 const LINKEDIN = "https://linkedin.com/in/harishma-m";
 // Free key from https://web3forms.com (type your email, the key arrives in your inbox). Paste it between the quotes:
-const FORM_KEY = "ac5e7019-b43f-480c-9306-70d6642ced9c";
+const FORM_KEY = "";
 const EMAIL    = "officialmail2hari@gmail.com";
 const RESUME   = "Harishma_M.pdf";
 
@@ -34,18 +34,25 @@ const SKILLS = [   // [emoji, name, one-line description shown when hovered]
 
 /* repo = exact repository name on GitHub. demo = live link ("" if none). */
 const PROJECTS = [
-  { title: "HELIXVAULT", repo: "HeliXVault", demo: "", tags: ["Python", "Data Storage", "Bioinformatics"],
-    desc: "A DNA Based Cold Data Archival System that uses DNA sequences to encode and store digital data." },
-  { title: "MYZONE-SFRC360", repo: "MyZone-360", demo: "", tags: ["Python", "AI", "Campus Tech"],
-    desc: "An AI-powered campus management platform integrating student services, academic information, and campus operations." },
-  { title: "MONLYTICX", repo: "Expenses", demo: "", tags: ["Python", "Web", "Finance"],
-    desc: "An Expense Tracker Web Application that allows users to track their expenses and manage their finances effectively." },
   { title: "PRAGYA AI", repo: "Pragya", demo: "", tags: ["AI", "Chatbot", "HTML"],
     desc: "An AI-powered chatbot that provides personalized responses and assistance to users based on their queries and preferences." },
+  { title: "MONLYTICX", repo: "Expenses", demo: "", status: "🚧 In development", tags: ["Python", "Web", "Finance"],
+    desc: "An Expense Tracker Web Application that allows users to track their expenses and manage their finances effectively." },
+  { title: "MYZONE-SFRC360", repo: "MyZone-360", demo: "", tags: ["Python", "AI", "Campus Tech"],
+    desc: "An AI-powered campus management platform integrating student services, academic information, and campus operations." },
+  { title: "HELIXVAULT", repo: "HeliXVault", demo: "", tags: ["Python", "Data Storage", "Bioinformatics"],
+    desc: "A DNA Based Cold Data Archival System that uses DNA sequences to encode and store digital data." },
+  { title: "FEMGUARD", repo: "", demo: "", status: "🔒 Hardware · no public code", tags: ["IoT", "GSM", "Safety"],
+    desc: "A standalone GSM-based wearable security device for women's safety, also published as a conference paper." },
+  { title: "SMART AGRICULTURAL ASSISTANT", repo: "Agri_Assist", demo: "", tags: ["Mini Project", "AI", "Agriculture"],
+    desc: "A mini project that assists farmers with smart, data-driven agricultural support." },
+  { title: "CIVICFIX", repo: "CivicFix", demo: "", tags: ["Web", "Civic Tech"],
+    desc: "A civic-tech platform for reporting and tracking community issues." },
+  { title: "BUDDYTRON", repo: "", demo: "", status: "🔒 Hardware · Code not public", tags: ["AI", "Assistant"],
+    desc: "An interactive buddy-style assistant project." },
 ];
 
-/* ===== EDIT ME: replace these two placeholders with your real papers =====
-   scope must be "International" or "National". Delete / add entries freely. */
+
 const PAPERS = [
   { title: "FemGuard: A Standalone GSM-Based Wearable Security Device for Women's Safety",
     venue: "National Conference", place: "", year: "", scope: "National", role: "Second author", status: "Presented",
@@ -85,8 +92,6 @@ function h(tag, props, ...kids) {
 }
 const ext = (label, href) => h("a", { href, target: "_blank", rel: "noopener" }, label);
 
-/* ============================ SOUND ================================ */
-/* Everything is synthesised live with the Web Audio API: no files. */
 const Snd = (() => {
   let ctx, master, noise, thrGain, ready = false, on = false;
   function ensure() {
@@ -251,7 +256,8 @@ function buildProjects() {
   } }, t)));
   const card = p => h("article", { class: "pcard" }, h("h3", null, p.title), h("p", null, p.desc),
     h("div", { class: "tags" }, p.tags.map(t => h("span", null, t))),
-    h("div", { class: "links" }, p.demo ? ext("Live demo ↗", p.demo) : null, ext("Code ↗", GITHUB + "/" + p.repo)));
+    p.status ? h("p", { class: "pstatus" }, p.status) : null,
+    h("div", { class: "links" }, p.demo ? ext("Live demo ↗", p.demo) : null, p.repo ? ext("Code ↗", GITHUB + "/" + p.repo) : null));
   function paint() {
     const s = q.value.trim().toLowerCase();
     const list = PROJECTS.filter(p => (tag === "All" || p.tags.includes(tag)) && (p.title + " " + p.desc + " " + p.tags.join(" ")).toLowerCase().includes(s));
@@ -651,7 +657,7 @@ const CMDS = {
   whoami() { say("harishma — data science student · builder · lifelong learner"); },
   about() { say(ABOUT.text); },
   skills() { SKILLS.forEach(g => say(g.g + ": " + g.items.map(i => i[1]).join(", "))); },
-  projects() { PROJECTS.forEach(p => { say("• " + p.title + " — " + p.desc); sayLink("   " + GITHUB.replace("https://", "") + "/" + p.repo, GITHUB + "/" + p.repo); }); },
+  projects() { PROJECTS.forEach(p => { say("• " + p.title + " — " + p.desc); (p.repo ? sayLink("   " + GITHUB.replace("https://", "") + "/" + p.repo, GITHUB + "/" + p.repo) : say("   " + (p.status || ""))); }); },
   papers() { PAPERS.forEach(p => say("• " + p.title + " — " + [p.venue, p.place, p.year].filter(Boolean).join(", ") + " (" + p.scope + (p.status ? ", " + p.status.toLowerCase() : "") + ")")); },
   education() { EDU.forEach(e => say(e.d + "  " + e.t + " · " + e.s)); },
   contact() { say("Email: " + EMAIL); sayLink("GitHub: " + GITHUB, GITHUB); sayLink("LinkedIn: " + LINKEDIN, LINKEDIN); },
