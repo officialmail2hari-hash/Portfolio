@@ -1,163 +1,72 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>HARISHMA M | Portfolio</title>
-  <meta name="description" content="Portfolio of HARISHMA M - Data Science student." />
+  <meta name="description" content="Portfolio of Harishma M - Data Science student. Explore it as a 3D cube or fly through it in a game world." />
+  <meta name="theme-color" content="#04050b" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="extras.css" />
-  <script>try{if(sessionStorage.getItem("splash"))document.documentElement.classList.add("no-splash")}catch(e){}</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="world.css" />
 </head>
-<body>
-  <div id="splash" aria-label="Loading portfolio">
-    <div class="sp-inner">
-      <div class="sp-mark">
-        <span class="sp-ring"></span>
-        <div class="sp-logo"><span class="l1">H</span><span class="l2">M</span><span class="l3">.</span></div>
+<body class="mode-cube">
+  <canvas id="space" aria-hidden="true"></canvas>
+
+  <!-- ENTRY GATE (also unlocks sound, which browsers only allow after a click) -->
+  <div id="gate">
+    <div class="g-in">
+      <div class="g-logo">HM<i>.</i></div>
+      <p class="g-sub">Data Science · Portfolio</p>
+      <div class="g-btns">
+        <button id="gSound" class="btn primary" type="button">🔊 Enter with sound</button>
+        <button id="gSilent" class="btn" type="button">🔇 Enter silently</button>
       </div>
-      <p class="sp-text">Data Science · Portfolio</p>
-      <div class="sp-line"><i></i></div>
-      <p class="sp-pct"><span id="spPct">0</span>%</p>
+      <a class="g-classic" href="classic.html">Prefer a normal scrolling page? Open the classic view →</a>
     </div>
-    <button id="spSkip" class="sp-skip" type="button">Skip ›</button>
   </div>
 
-  <div id="progress" aria-hidden="true"></div>
-  <canvas id="bg" aria-hidden="true"></canvas>
-  <div id="glow" aria-hidden="true"></div>
-
-  <header class="nav">
-    <a href="#home" class="logo">HM<span>.</span></a>
-    <nav>
-      <a href="#about">About</a>
-      <a href="#skills">Skills</a>
-      <a href="#projects">Projects</a>
-      <a href="#education">Education</a>
-      <a href="#contact">Contact</a>
+  <header class="hud">
+    <div class="brand" id="brand" title="HARISHMA M">
+      <b><span class="full">HARISHMA M</span><span class="short">HM.</span></b><small>Data Science · Portfolio</small>
+    </div>
+    <nav class="tools" aria-label="Controls">
+      <button id="bMode" class="tbtn" type="button" aria-label="Switch mode"><span class="ic">🚀</span><span class="lbl">Game mode</span></button>
+      <button id="bSound" class="tbtn" type="button" aria-label="Toggle sound"><span class="ic">🔇</span><span class="lbl">Sound</span></button>
+      <button id="bAch" class="tbtn" type="button" aria-label="Achievements"><span class="ic">🏆</span><span class="lbl" id="achCount">0/6</span></button>
+      <a id="bClassic" class="tbtn" href="classic.html"><span class="ic">📄</span><span class="lbl">Classic view</span></a>
+      <a id="bResume" class="tbtn solid" href="Harishma_M.pdf" download><span class="ic">⬇</span><span class="lbl">Résumé</span></a>
     </nav>
-    <button id="themeToggle" aria-label="Toggle theme (press T)">🌙</button>
   </header>
 
-  <main>
-    <!-- HERO -->
-    <section id="home" class="hero">
-      <p class="eyebrow">Hi, I'm</p>
-      <h1>HARISHMA M</h1>
-      <h2>I'm a <span id="typed"></span><span class="cursor">|</span></h2>
-      <p class="lead">Data science student passionate about leveraging data to solve real-world problems.</p>
-      <div class="cta">
-        <a class="btn primary" href="#projects">View my work</a>
-        <a class="btn" href="Harishma_M.pdf" download>Download résumé</a>
-      </div>
-      <div class="stats">
-        <div class="stat"><b id="statProjects" data-count="4">0</b><span>Projects</span></div>
-        <div class="stat"><b data-count="2">0</b><span>Internships</span></div>
-        <div class="stat"><b data-count="8.9" data-decimals="1">0</b><span>CGPA</span></div>
-      </div>
-    </section>
-
-        <div class="marquee" aria-hidden="true">
-      <div class="marquee-track">
-        <span>Python</span><span>Data Analysis</span><span>Machine Learning</span><span>SQL</span>
-        <span>Git &amp; GitHub</span><span>Canva</span><span>Power BI</span><span>Cloud Computing</span>
-      </div>
+  <main id="stage">
+    <div id="scene" aria-label="3D cube. Drag to rotate, click a face to open it.">
+      <div id="cube"></div>
+      <div class="floor" aria-hidden="true"></div>
     </div>
-
-    <!-- ABOUT -->
-    <section id="about" class="reveal">
-      <h3 class="section-title">About me</h3>
-      <div class="about-grid">
-        <p>I’m a Data Science student who loves turning ideas into intelligent, real-world solutions. From data analytics to AI-powered applications, I enjoy experimenting with technology, solving problems, and building things that make a difference. Always learning, always building, and always looking for the next challenge.</p>
-        <ul class="facts">
-          <li><strong>📍</strong> Rajapalayam, Viruthunagar District, TN</li>
-          <li><strong>🎓</strong>  B.Sc in Data Science — The Standard Fireworks College for Women</li>
-          <li><strong>💼</strong> Open to internships</li>
-          <li><strong>🌱</strong> Currently learning: Cloud Computing, Power BI</li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- SKILLS -->
-    <section id="skills" class="reveal">
-      <h3 class="section-title">Skills</h3>
-      <div class="skill-tabs" id="skillTabs" role="tablist" aria-label="Filter skills">
-        <button class="chip active" data-cat="all">All</button>
-        <button class="chip" data-cat="data">Data &amp; AI</button>
-        <button class="chip" data-cat="tools">Tools</button>
-        <button class="chip" data-cat="learning">Learning</button>
-      </div>
-      <div class="skill-grid" id="skillGrid">
-        <div class="skill-card" data-cat="data"><span class="s-icon">🐍</span><h4>Python</h4><p>Scripting &amp; analysis</p></div>
-        <div class="skill-card" data-cat="data"><span class="s-icon">📊</span><h4>Data Analysis</h4><p>Cleaning, EDA &amp; reporting</p></div>
-        <div class="skill-card" data-cat="data"><span class="s-icon">🤖</span><h4>Machine Learning</h4><p>Models &amp; experiments</p></div>
-        <div class="skill-card" data-cat="data"><span class="s-icon">🗄️</span><h4>SQL</h4><p>Querying databases</p></div>
-        <div class="skill-card" data-cat="tools"><span class="s-icon">🐙</span><h4>Git &amp; GitHub</h4><p>Version control</p></div>
-        <div class="skill-card" data-cat="tools"><span class="s-icon">🎨</span><h4>Canva</h4><p>Design &amp; visuals</p></div>
-        <div class="skill-card learning" data-cat="learning"><span class="s-icon">☁️</span><h4>Cloud Computing</h4><p>Learning now</p></div>
-        <div class="skill-card learning" data-cat="learning"><span class="s-icon">📈</span><h4>Power BI</h4><p>Learning now</p></div>
-      </div>
-    </section>
-
-    <!-- PROJECTS -->
-    <section id="projects" class="reveal">
-      <h3 class="section-title">Projects</h3>
-      <div class="controls">
-        <input id="search" type="search" placeholder="Search projects…" aria-label="Search projects" />
-        <div id="filters" class="filters"></div>
-      </div>
-      <div id="grid" class="grid"></div>
-      <p id="empty" class="empty" hidden>No projects match your search.</p>
-
-      <div id="more" class="more" hidden>
-        <h4>More on GitHub</h4>
-        <div id="moreList" class="more-list"></div>
-      </div>
-    </section>
-
-    <!-- EDUCATION -->
-    <section id="education" class="reveal">
-      <h3 class="section-title">Education &amp; Experience</h3>
-      <div class="timeline">
-        <div class="item"><span class="date">2024 – Present</span><h4>B.Sc in Data Science</h4><p>The Standard Fireworks College for Women · CGPA 8.9</p></div>
-        <div class="item"><span class="date">Apr - Aug 2025</span><h4>Operations Intern - Spellzee Edutech Solutions Pvt. Ltd. </h4><p>Data Handling and Reporting</p></div>
-        <div class="item"><span class="date">Apr 2026</span><h4>Intern — Anjana Infotech</h4><p>Learned basics in AI/ML</p></div>
-        <div class="item"><span class="date">2019 – 2020</span><h4>Higher Secondary</h4><p>AKD Dharmaraja Girls Higher Secondary School · State Board</p></div>
-      </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact" class="reveal">
-      <h3 class="section-title">Get in touch</h3>
-      <p class="lead small">I'm open to full-time jobs and internships. Say hello!</p>
-      <form id="contactForm" class="form">
-        <input name="name" placeholder="Your name" required />
-        <input name="email" type="email" placeholder="Your email" required />
-        <textarea name="message" rows="5" placeholder="Your message" required></textarea>
-        <button class="btn primary" type="submit">Send message</button>
-      </form>
-      <div class="socials">
-        <a href="https://github.com/officialmail2hari-hash" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://linkedin.com/in/harishma-m" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="mailto:officialmail2hari@gmail.com">Email</a>
-      </div>
-    </section>
   </main>
 
-  <footer>© <span id="year"></span> HARISHMA M · Built with Passion &amp; JS</footer>
+  <nav id="facenav" aria-label="Sections"></nav>
+  <p id="hint"></p>
+  <button id="dock" type="button" hidden></button>
 
-  <dialog id="modal" aria-labelledby="mTitle">
-    <button class="m-close" id="mClose" aria-label="Close">✕</button>
-    <h3 id="mTitle"></h3>
-    <p id="mDesc"></p>
-    <div id="mTags" class="tags"></div>
-    <p id="mMeta" class="m-meta"></p>
-    <div id="mLinks" class="links"></div>
-  </dialog>
+  <!-- SECTION PANEL -->
+  <div id="panel" role="dialog" aria-modal="true" aria-labelledby="pTitle">
+    <div class="sheet" id="sheet"></div>
+  </div>
 
-  <button id="toTop" aria-label="Back to top" hidden>↑</button>
-  <script src="script.js"></script>
+  <!-- ACHIEVEMENTS -->
+  <aside id="ach" aria-label="Achievements" hidden></aside>
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <!-- HIDDEN TERMINAL -->
+  <div id="term" role="dialog" aria-label="Terminal" aria-hidden="true">
+    <div class="t-bar"><i></i><i></i><i></i><span>harishma@portfolio:~</span><button id="tClose" type="button" aria-label="Close terminal">✕</button></div>
+    <div id="tout" class="t-out"></div>
+    <label class="t-row"><span>❯</span><input id="tin" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Terminal input" /></label>
+  </div>
+
+  <noscript><p style="position:fixed;inset:0;z-index:999;display:grid;place-items:center;background:#04050b;color:#fff;font-family:sans-serif;text-align:center;padding:24px">This interactive version needs JavaScript. <a style="color:#7cc4ff" href="classic.html">Open the classic view</a>.</p></noscript>
+  <script src="world.js"></script>
 </body>
 </html>
